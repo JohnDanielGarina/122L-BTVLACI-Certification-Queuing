@@ -1,4 +1,6 @@
-<?php require_once 'config.php'; 
+<?php 
+require_once 'config.php'; 
+require_once 'functions.php';
 
 $error = $success = $queue_info = '';
 $queue_number = '';

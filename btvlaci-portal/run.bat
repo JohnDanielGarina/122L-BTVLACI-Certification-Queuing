@@ -1,5 +1,5 @@
 @echo off
-cd /d "%~dp0btvlaci-portal"
+cd /d "%~dp0"
 
 echo ==========================================
 echo   BTVLACI Certification Queue Portal
@@ -8,15 +8,7 @@ echo.
 
 if not exist btvlaci.db (
     echo [INIT] Creating fresh database...
-    php -r "
-        $pdo = new PDO('sqlite:btvlaci.db');
-        $pdo->exec(file_get_contents('init.sql'));
-        $hash = password_hash('admin123', PASSWORD_DEFAULT);
-        $stmt = $pdo->prepare(\"INSERT INTO admins (name, email, password_hash) VALUES ('Admin User', 'admin@btvlaci-portal.local', ?)\");
-        $stmt->execute([$hash]);
-        echo '[INIT] Database created!' . PHP_EOL;
-        echo '[INIT] Admin: admin@btvlaci-portal.local / admin123' . PHP_EOL;
-    "
+    php\php.exe -c php\php.ini init_db.php
 ) else (
     echo [DB] Database found.
 )
@@ -29,4 +21,4 @@ echo.
 echo Press Ctrl+C to stop the server.
 echo.
 
-php -S localhost:8000
+php\php.exe -c php\php.ini -d extension_dir="php\ext" -S localhost:8000 router.php
