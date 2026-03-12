@@ -26,7 +26,7 @@ if ($_POST && $_POST['csrf'] === $_SESSION['csrf_token']) {
       update_app_status($pdo, $app_id, 'Rejected', $_SESSION['user_id'], $reason);
       break;
     case 'assign_batch':
-      $pdo->prepare('UPDATE applications SET batch_id = ?, status = \"Scheduled\" WHERE id = ?')->execute([$batch_id, $app_id]);
+      $pdo->prepare("UPDATE applications SET batch_id = ?, status = 'Scheduled' WHERE id = ?")->execute([$batch_id, $app_id]);
       log_activity($pdo, $_SESSION['user_id'], 'batch_assign', 'application', $app_id, "Assigned to batch {$batch_id}");
       break;
   }

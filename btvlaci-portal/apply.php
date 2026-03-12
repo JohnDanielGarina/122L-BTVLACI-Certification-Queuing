@@ -1,5 +1,6 @@
 <?php 
 require_once 'config.php'; 
+require_once 'functions.php'; // <-- ADD THIS
 
 auth_check('applicant');
 
@@ -7,7 +8,7 @@ $user_id = $_SESSION['user_id'];
 $pdo = new PDO('sqlite:' . DB_PATH);
 
 // Check if active app
-$stmt = $pdo->prepare('SELECT COUNT(*) FROM applications WHERE applicant_id = ? AND status IN (\"Pending\",\"Incomplete\")');
+$stmt = $pdo->prepare("SELECT COUNT(*) FROM applications WHERE applicant_id = ? AND status IN ('Pending','Incomplete')");
 $stmt->execute([$user_id]);
 if ($stmt->fetchColumn() > 0) {
   header('Location: dashboard.php');

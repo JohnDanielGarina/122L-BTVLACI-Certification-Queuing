@@ -1,5 +1,6 @@
 <?php 
 require_once 'config.php'; 
+require_once 'functions.php'; // <-- ADD THIS
 
 auth_check('applicant');
 
@@ -17,7 +18,7 @@ if (!$app) { header('Location: dashboard.php'); exit; }
 // Check deadline & update status if expired
 $deadline_passed = strtotime($app['doc_deadline']) < time();
 if ($deadline_passed && $app['status'] === 'Incomplete') {
-  $pdo->prepare('UPDATE applications SET status = \"Rejected\" WHERE id = ?')->execute([$app_id]);
+  $pdo->prepare("UPDATE applications SET status = 'Rejected' WHERE id = ?")->execute([$app_id]); // <-- fixed quotes
   $app['status'] = 'Rejected';
   $reason = 'Documents not uploaded within 48 hours.';
 }

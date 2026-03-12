@@ -1,6 +1,6 @@
 <?php 
 require_once 'config.php'; 
-require_once 'functions.php'; // We'll create this later
+require_once 'functions.php';
 
 auth_check('applicant');
 
@@ -8,7 +8,7 @@ $pdo = new PDO('sqlite:' . DB_PATH);
 $user_id = $_SESSION['user_id'];
 
 // Check active application
-$stmt = $pdo->prepare('SELECT * FROM applications WHERE applicant_id = ? AND status IN (\"Pending\",\"Incomplete\",\"Approved\",\"Rejected\",\"Scheduled\") ORDER BY created_at DESC LIMIT 1');
+$stmt = $pdo->prepare("SELECT * FROM applications WHERE applicant_id = ? AND status IN ('Pending','Incomplete','Approved','Rejected','Scheduled') ORDER BY created_at DESC LIMIT 1");
 $stmt->execute([$user_id]);
 $app = $stmt->fetch();
 
@@ -52,8 +52,9 @@ $show_apply = !$app;
             <strong>Qualification:</strong> <?= $app['qualification'] === 'NCII' ? 'NC II' : 'NC III' ?>
           </div>
           <?php if ($app['batch_id']): 
-            $batch = $pdo->prepare('SELECT * FROM batches WHERE id = ?')->execute([$app['batch_id']]);
-            $batch = $pdo->fetch();
+            $batchStmt = $pdo->prepare('SELECT * FROM batches WHERE id = ?');
+            $batchStmt->execute([$app['batch_id']]);
+            $batch = $batchStmt->fetch();
           ?>
           <div>
             <strong>Batch:</strong> <?= htmlspecialchars($batch['batch_code'] ?? '') ?> | <?= $batch['schedule_datetime'] ?? '' ?>

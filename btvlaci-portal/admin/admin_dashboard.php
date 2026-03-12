@@ -6,9 +6,9 @@ auth_check('admin');
 
 $pdo = new PDO('sqlite:' . DB_PATH);
 
-$pending_count = $pdo->query('SELECT COUNT(*) FROM applications WHERE status = \"Pending\"')->fetchColumn();
-$incomplete_count = $pdo->query('SELECT COUNT(*) FROM applications WHERE status = \"Incomplete\"')->fetchColumn();
-$upcoming_batches = $pdo->query('SELECT COUNT(*) FROM batches WHERE status = \"Open\" OR status = \"Scheduled\"')->fetchColumn();
+$pending_count = $pdo->query("SELECT COUNT(*) FROM applications WHERE status = 'Pending'")->fetchColumn();
+$incomplete_count = $pdo->query("SELECT COUNT(*) FROM applications WHERE status = 'Incomplete'")->fetchColumn();
+$upcoming_batches = $pdo->query("SELECT COUNT(*) FROM batches WHERE status = 'Open' OR status = 'Scheduled'")->fetchColumn();
 ?>
 <!DOCTYPE html>
 <html lang="en">
