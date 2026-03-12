@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // File upload validation & preview
-  const fileInputs = document.querySelectorAll('input[type=\"file\"]');
+  const fileInputs = document.querySelectorAll('input[type="file"]');
   fileInputs.forEach(input => {
     input.addEventListener('change', function(e) {
       const file = e.target.files[0];

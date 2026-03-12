@@ -46,7 +46,9 @@ function send_email($to, $subject, $body) {
 
 // Update app status with log
 function update_app_status($pdo, $app_id, $status, $admin_id = null, $reason = '') {
-  $old_status = $pdo->query("SELECT status FROM applications WHERE id = {$app_id}")->fetchColumn();
+$stmt = $pdo->prepare("SELECT status FROM applications WHERE id = ?");
+$stmt->execute([$app_id]);
+$old_status = $stmt->fetchColumn();
   $pdo->prepare('UPDATE applications SET status = ? WHERE id = ?')->execute([$status, $app_id]);
   if ($admin_id) {
     log_activity($pdo, $admin_id, 'status_change', 'application', $app_id, "Changed from {$old_status} to {$status}: {$reason}");

@@ -26,7 +26,7 @@ $upcoming_batches = $pdo->query("SELECT COUNT(*) FROM batches WHERE status = 'Op
       </div>
       <div>
         <a href="../dashboard.php">Applicant View</a>
-        <a href="logout.php" class="logout">Logout</a>
+        <a href="../logout.php" class="logout">Logout</a>
       </div>
     </nav>
     

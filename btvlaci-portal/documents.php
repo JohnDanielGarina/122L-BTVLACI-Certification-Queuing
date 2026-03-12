@@ -26,7 +26,7 @@ if ($deadline_passed && $app['status'] === 'Incomplete') {
 // Handle uploads
 if ($_POST && $_POST['csrf'] === $_SESSION['csrf_token']) {
   foreach (['id_card', 'photo_2x2'] as $type) {
-    if (isset($_FILES[$type]) && $_FILES[$type]['error'] === UPLOAD_OK) {
+    if (isset($_FILES[$type]) && $_FILES[$type]['error'] === UPLOAD_ERR_OK) {
       $file = $_FILES[$type];
       if (in_array($file['type'], ALLOWED_TYPES) && $file['size'] <= MAX_FILE_SIZE) {
         $ext = pathinfo($file['name'], PATHINFO_EXTENSION);
@@ -40,11 +40,12 @@ if ($_POST && $_POST['csrf'] === $_SESSION['csrf_token']) {
     }
   }
   // Check if complete
-  $missing = $pdo->prepare('SELECT COUNT(*) FROM documents WHERE application_id = ?')->execute([$app_id]);
-  $docs_count = $missing->fetchColumn();
+  $countStmt = $pdo->prepare('SELECT COUNT(*) FROM documents WHERE application_id = ?');
+  $countStmt->execute([$app_id]);
+  $docs_count = $countStmt->fetchColumn();
   $required = $app['qualification'] === 'NCIII' ? 3 : 2;
   if ($docs_count >= $required) {
-    $pdo->prepare('UPDATE applications SET status = \"Pending\" WHERE id = ?')->execute([$app_id]);
+    $pdo->prepare("UPDATE applications SET status = 'Pending' WHERE id = ?")->execute([$app_id]);
   }
 }
 
