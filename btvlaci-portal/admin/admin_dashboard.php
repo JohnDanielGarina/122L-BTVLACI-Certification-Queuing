@@ -1,14 +1,16 @@
-<?php 
-require_once '../config.php'; 
-require_once '../functions.php'; 
-
-auth_check('admin');
+<?php
+require_once '../config.php';
+require_once '../functions.php';
+auth_check();
 
 $pdo = new PDO('sqlite:' . DB_PATH);
+$pending = $pdo->query("SELECT COUNT(*) FROM queues WHERE status='Pending'")->fetchColumn();
+$approved = $pdo->query("SELECT COUNT(*) FROM queues WHERE status='Approved'")->fetchColumn();
+$scheduled = $pdo->query("SELECT COUNT(*) FROM queues WHERE status='Scheduled'")->fetchColumn();
+$total = $pdo->query("SELECT COUNT(*) FROM queues")->fetchColumn();
 
-$pending_count = $pdo->query("SELECT COUNT(*) FROM applications WHERE status = 'Pending'")->fetchColumn();
-$incomplete_count = $pdo->query("SELECT COUNT(*) FROM applications WHERE status = 'Incomplete'")->fetchColumn();
-$upcoming_batches = $pdo->query("SELECT COUNT(*) FROM batches WHERE status = 'Open' OR status = 'Scheduled'")->fetchColumn();
+// Recent activity
+$recent = $pdo->query("SELECT * FROM queues ORDER BY created_at DESC LIMIT 5")->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,44 +18,75 @@ $upcoming_batches = $pdo->query("SELECT COUNT(*) FROM batches WHERE status = 'Op
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard - BTVLACI</title>
-  <link rel="stylesheet" href="../assets/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/admin.css">
 </head>
 <body>
-  <div class="container">
-    <nav class="nav">
-      <div>
-        <strong>Admin Panel</strong>
+  <div class="admin-layout">
+    <?php include 'partials/sidebar.php'; ?>
+    <main class="admin-main">
+      <div class="admin-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Welcome back, <?= htmlspecialchars($_SESSION['admin_name']) ?>!</p>
+        </div>
+        <div class="header-date"><?= date('F j, Y') ?></div>
       </div>
-      <div>
-        <a href="../dashboard.php">Applicant View</a>
-        <a href="../logout.php" class="logout">Logout</a>
+
+      <div class="stats-grid">
+        <div class="stat-card stat-pending">
+          <div class="stat-icon">⏳</div>
+          <div class="stat-info">
+            <h2><?= $pending ?></h2>
+            <p>Pending</p>
+          </div>
+        </div>
+        <div class="stat-card stat-approved">
+          <div class="stat-icon">✅</div>
+          <div class="stat-info">
+            <h2><?= $approved ?></h2>
+            <p>Approved</p>
+          </div>
+        </div>
+        <div class="stat-card stat-scheduled">
+          <div class="stat-icon">📅</div>
+          <div class="stat-info">
+            <h2><?= $scheduled ?></h2>
+            <p>Scheduled</p>
+          </div>
+        </div>
+        <div class="stat-card stat-total">
+          <div class="stat-icon">📋</div>
+          <div class="stat-info">
+            <h2><?= $total ?></h2>
+            <p>Total</p>
+          </div>
+        </div>
       </div>
-    </nav>
-    
-    <div class="grid">
+
       <div class="card">
-        <h3>📋 Pending Applications</h3>
-        <h2><?= $pending_count ?></h2>
-        <a href="admin_applications.php?status=Pending" class="btn">View</a>
+        <div class="card-head">
+          <h3>Recent Queue Entries</h3>
+          <a href="admin_queues.php" class="btn-link">View All →</a>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Queue #</th><th>Name</th><th>Certificate</th><th>Status</th><th>Date</th></tr>
+          </thead>
+          <tbody>
+            <?php foreach ($recent as $q): ?>
+            <tr>
+              <td><span class="code"><?= htmlspecialchars($q['queue_code']) ?></span></td>
+              <td><?= htmlspecialchars($q['name']) ?></td>
+              <td><?= htmlspecialchars($q['certificate']) ?></td>
+              <td><span class="badge badge-<?= strtolower($q['status']) ?>"><?= $q['status'] ?></span></td>
+              <td><?= date('M j, Y', strtotime($q['created_at'])) ?></td>
+            </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
       </div>
-      <div class="card">
-        <h3>⚠️ Incomplete</h3>
-        <h2><?= $incomplete_count ?></h2>
-        <a href="admin_applications.php?status=Incomplete" class="btn">View</a>
-      </div>
-      <div class="card">
-        <h3>📦 Upcoming Batches</h3>
-        <h2><?= $upcoming_batches ?></h2>
-        <a href="admin_batches.php" class="btn">Manage</a>
-      </div>
-    </div>
-    
-    <div class="flex gap-2 mt-4">
-      <a href="admin_applications.php" class="btn">All Applications</a>
-      <a href="admin_users.php" class="btn btn-secondary">Users</a>
-      <a href="admin_export.php" class="btn btn-secondary">Export CSV</a>
-    </div>
+    </main>
   </div>
 </body>
 </html>
-
